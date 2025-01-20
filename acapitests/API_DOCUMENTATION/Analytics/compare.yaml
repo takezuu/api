@@ -1,0 +1,248 @@
+  /api/compare:
+    summary: comparisons management
+    get:
+      summary: returns complete comparisons list
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: total number of comparisons without any filters
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        status:
+                          description: 0 - not ready, 1 - ready
+                          type: number
+                        created:
+                          description: date of the comparison creation (MM.DD.YYYY HH:MM:SS)
+                          type: string
+                        allOverlap:
+                          description: true for all results
+                          type: boolean
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load list of all comparisons
+    post:
+      summary: adds or updates the comparison depends on id value in the request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspaceRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: id of new or updated object
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not insert or update the comparison
+
+  /api/compare/{id}:
+    summary: one comparison management
+    get:
+      summary: returns detailed information about one comparison
+      parameters:
+        - name: id
+          description: if of the comparison
+          in: path
+          required: true
+          schema:
+              type: number
+      responses:
+        200:
+          description: returns comparison as a JSON object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspaceRequest'
+        400:
+          description: could not load the compare with provided id
+        401:
+          description: not logged or unauthorized request
+
+    delete:
+      summary: removes one comparison
+      parameters:
+        - name: id
+          description: if of the comparison
+          in: path
+          required: true
+          schema:
+              type: number
+      responses:
+        200:
+          description: comparison was deleted
+        400:
+          description: could not remove the compare with provided id
+        401:
+          description: not logged or unauthorized request
+
+  /api/compare/events:
+    summary: returns list of rows for selected comparison block
+    post:
+      summary: request list of rows for single comparison block
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cmpid:
+                  type: number
+                  description: comparison ID
+                blkid:
+                  type: number
+                  description: block ID
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    imgid:
+                      type: number
+                    objid:
+                      type: number
+                    isKeyEvd:
+                      type: boolean
+                    timestamp:
+                      type: string
+                    description:
+                      type: string
+                    commonValue:
+                      type: string
+                      description: common value for all events in the block
+                    color:
+                      type: string
+                      description: image's color
+
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not events of the comparison's block
+
+  /api/compare/grid:
+    post:
+      summary: returns list of rows for one comparison grid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                compareId:
+                  type: number
+                page:
+                  type: string
+                limit:
+                  type: string
+                order:
+                  $ref: '#/components/schemas/order'
+      responses:
+        200:
+          description: comparison grid data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        icon:
+                          type: string
+                        commonValue:
+                          type: string
+                        rows:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              imgid:
+                                type: number
+                              objid:
+                                type: number
+                              isKeyEvidence:
+                                type: boolean
+                              timestamp:
+                                type: string
+                                description: may be empty string. Format is MM.DD.YYYY HH:MM:SS
+                              description:
+                                type: string
+                              commonValue:
+                                type: string
+                              color:
+                                type: string
+                                description: hex color with '#' prefix
+                              hasPreview:
+                                type: boolean
+                                description: true means /api/preview is available for this pair of (imgid;objid)
+                        blkid:
+                          type: number
+                          description: id of the block of the "same" data
+                        cmpid:
+                          type: number
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load the grid rows for requested parameters
+
+  /api/compare/report:
+    summary: add the comparison report to queue
+    post:
+      summary: request list of rows for single comparison block
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cmpId:
+                  type: number
+                  description: comparison ID
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: id of the new report
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not add a new report

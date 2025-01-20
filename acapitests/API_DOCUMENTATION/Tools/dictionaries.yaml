@@ -1,0 +1,241 @@
+  /api/dictionaries:
+    get:
+      summary: returns list of dictionaries
+      responses:
+        200:
+          description: list of dictionaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/oneDictionary'
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not laod dictionaries list
+
+  /api/dictionaries/{id}:
+    summary: one dictionary management
+    get:
+      summary: returns information about one dictionary
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        200:
+          description: returns one dictionary definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oneDictionary'
+        400:
+          description: provided id of the dictionary if empty or invalid
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: Could not find or load dictionary
+    delete:
+      summary: removes dictionary from the system
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        200:
+          description: dictionary was removed
+        400:
+          description: provided id of the dictionary if empty or invalid
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: Could not remove dictionary
+
+    post:
+      summary: adds or updates the dictionary
+      responses:
+        200:
+          description: dictionary was added or updated
+        400:
+          description: provided id of the dictionary if empty or invalid
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: Could not add or modify the dictionary
+
+  /api/dictionaries/export:
+    summary: export dictionary content
+    get:
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: format
+          in: query
+          required: true
+          schema:
+            type: string
+            description: csv or json only
+      responses:
+        200:
+          description: the dictionary content data in responce
+        400:
+          description: wrong dictionary id or format
+        500:
+          description: export error
+
+  /api/dictionaries/import:
+    summary: import dictionary content
+    post:
+      parameters:
+        - name: file
+          in: query
+          required: true
+          schema:
+            type: string
+            format: binary
+            description: content of CSV or XLSX file depends on type value
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dictid:
+                  type: number
+                type:
+                  type: string
+                  description: CSV or XLSX
+                name:
+                  type: string
+      responses:
+        200:
+          description: the dictionary content was imported
+        400:
+          description: wrong dictionary id, type or empty name or file
+        500:
+          description: import error
+
+  /api/dictionary_index:
+    summary: runs re-indexing for all or single dictionary
+    get:
+      summary: re-index all dictionaries for one image. No Authorization required
+      parameters:
+        - name: imgid
+          in: query
+          description: id of image to be re-indexed
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: the image scheduled to indexing
+        400:
+          description: empty on invalid dictionary id was passed
+    post:
+      summary: re-index all images for one dictionary
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dictid:
+                  type: number
+      responses:
+        200:
+          description: dictionary scheduled to indexing
+        401:
+          description: not logged or unauthorized request
+
+  /api/dictionaryContent:
+    post:
+      summary: returns lost of words in dictionary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                limit:
+                  type: number
+                page:
+                  type: number
+                search:
+                  type: string
+      responses:
+        200:
+          description: returns list of words withs ids
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        wordid:
+                          type: number
+                        word:
+                          type: string
+        400:
+          description: incorrect request parameters
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not get list of words
+
+  /api/dictionaryContentUpdate:
+    post:
+      summary: adds new word to dictionary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dictid:
+                  type: number
+                word:
+                  type: string
+      responses:
+        200:
+          description: words was added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wordid:
+                    type: number
+    delete:
+      summary: removes a word from dictionary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dictid:
+                  type: number
+                wordid:
+                  type: number
+      responses:
+        200:
+          description: words was removed

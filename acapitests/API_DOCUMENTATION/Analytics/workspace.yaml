@@ -1,0 +1,243 @@
+  /api/workspace/histogram:
+    summary: returns data for events-based histogram of workspace
+
+  /api/workspace/item:
+    get:
+      summary: returns one workspace item by imgid and objid
+      responses:
+        200:
+          description: list of workspace row properties
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  description: one property of the row as a pair of name and value
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: string
+        400:
+          description: incorrect imgid and/or objid
+        401:
+          description: not logged or unauthorized request
+        404:
+          description: item not found or can't be loaded
+      parameters:
+        - name: imgid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: objid
+          in: query
+          required: true
+          schema:
+              type: number
+
+  /api/workspace/item/eml:
+    summary: export e-mails for items to EML files list (as a zip archive)
+
+  /api/workspace/grid:
+    post:
+      summary: returns page (list of rows) of workspace
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspaceRequest'
+
+      responses:
+        200:
+          description: total rows counter and array of rows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/workspaceRow'
+        400:
+          description: the request is not correct
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load grid data
+
+  /api/workspace/map:
+    post:
+      summary: returns data for map
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspaceRequest'
+
+      responses:
+        200:
+          description: total rows counter and array of rows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/mapRow'
+        400:
+          description: the request is not correct
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load grid data
+
+  /api/workspace/map/report:
+    post:
+      summary: add new report for map to report queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: id of added item
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not add a new report
+
+  /api/workspace/note:
+    summary: changes note of workspace or file item
+    post:
+      summary: changes note of the specified object
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imgid:
+                  type: number
+                objid:
+                  type: number
+                note:
+                  type: string
+      responses:
+        200:
+          description: note of the specified object was modified
+        400:
+          description: object not found or can't be updated
+        401:
+          description: not logged or unauthorized request
+
+  /api/workspace/report:
+    post:
+      summary: starts a workspace report execution
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request:
+                    $ref: '#/components/schemas/workspaceRequest'
+                  fileName:
+                    type: string
+                  format:
+                    type: string
+                    description: XLSX,TXT,XML,PDF, etc
+                  note:
+                    type: string
+                  withFiles:
+                    type: boolean
+                  withDetails:
+                    type: boolean
+                  withThumbnails:
+                    type: boolean
+      responses:
+        200:
+          description: the report was added to queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    description: id of the created report
+        401:
+          description: not logged or unauthorized request
+
+  /api/workspace/star:
+    summary: changes is key evidence (star) property of workspace or file star
+    post:
+      summary: changes key evidence (star) of the specified object (file or workspace row)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imgid:
+                  type: number
+                objid:
+                  type: number
+                value:
+                  type: boolean
+      responses:
+        200:
+          description: star of the specified object was modified
+        400:
+          description: object not found or can't be updated
+        401:
+          description: not logged or unauthorized request
+
+  /api/workspace/tags:
+    post:
+      summary: assigns tags to workspace row(s) or file(s)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                objects:
+                  type: array
+                  items:
+                    description: list of rows or files to be changed
+                    type: object
+                    properties:
+                      imgid:
+                        type: number
+                      objid:
+                        type: number
+                type:
+                  type: string
+                  description: string 'file' for files, otherwise is workspace row
+                tags:
+                  type: array
+                  items:
+                    type: number
+      responses:
+        200:
+          description: tags was assigned
+        400:
+          description: object not found or can't be updated
+        401:
+          description: not logged or unauthorized request

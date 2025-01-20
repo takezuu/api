@@ -1,0 +1,33 @@
+  /api/crimetypes:
+    summary: returns list of crime_types types
+    post:
+      summary: returns list of available crime_types types
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                    type: number
+                page:
+                    type: number
+                search:
+                    type: string
+                dateFrom:
+                    type: string
+                dateTo:
+                    type: string
+                order:
+                    type: string
+      responses:
+        200:
+          description: list of crime_types types
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not get list of crime_types types
+
+  /api/crimetypes/{id}:
+    summary: one crime_types type operations

@@ -1,0 +1,201 @@
+  /api/devices:
+    post:
+      summary: returns list of devices with requested properties
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: substring in the name or in the alias
+                  type: string
+                dateFrom:
+                  type: string
+                dateTo:
+                  type: string
+                limit:
+                  type: number
+                  description: number of items on the page
+                page:
+                  description: the first is 1
+                  type: number
+                order:
+                  $ref: '#/components/schemas/order'
+                props:
+                  type: array
+      responses:
+        200:
+          description: returns an array of devices (JSON)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: total number of devices without filtering
+                  results:
+                    $ref: '#/components/schemas/oneDevice'
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load device list
+
+  /api/devices/analyzer:
+    summary: core "test analyzer" statistics for image(s)
+
+  /api/devices/analyzer/dictionaries:
+    summary: returns information about dictionaries used in the text analyzer
+
+  /api/devices/analyzer/dictionaries/activity:
+    summary: returns information about activity of dictionaries in the text analyzer
+
+  /api/devices/analyzer/dictionaries/import:
+    summary: the text analyzer dictionaries import function
+
+  /api/devices/analyzer/words:
+    summary: word-level "test analyzer" statistics for image(s)
+
+  /api/devices/{id}:
+    summary: one device management
+    get:
+      summary: returns complete information about one device
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of device
+          schema:
+            type: number
+      responses:
+        200:
+          description: detailed/complete information about the device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oneDeviceDetails'
+        400:
+          description: provided image id is invalid or not image found
+        401:
+          description: not logged or unauthorized request
+
+    delete:
+      summary: starts the removing process for the device
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of device
+          schema:
+            type: number
+      responses:
+        200:
+          description: the device scheduled to removing
+        401:
+          description: not logged or unauthorized request
+    post:
+      summary: update the device information by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of device
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: only alias, color, note and timezones can be updated with the API call
+              $ref: '#/components/schemas/oneDevice'
+      responses:
+        200:
+          description: the device information was updated
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not update the image information
+
+  /api/devices/chart:
+    summary: device's chart uploading call
+    post:
+      summary: upload charts for specified image
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: images id, integer
+          schema:
+            type: number
+        - name: applications
+          in: formData
+          type: file
+        - name: contacts
+          in: formData
+          type: file
+        - name: groups
+          in: formData
+          type: file
+        - name: communications
+          in: formData
+          type: file
+
+      responses:
+        200:
+          description: all provided charts was uploaded
+        401:
+          description: not logged or unauthorized request
+
+  /api/devices/upload:
+    summary: accepts uploaded file with .ofbx image
+    post:
+      summary: upload part of the file with image
+      parameters:
+        - name: first
+          schema:
+            type: boolean
+        - name: part
+          schema:
+            type: number
+        - name: fileSize
+          schema:
+            type: number
+        - name: file
+          in: formData
+          type: file
+
+      responses:
+        200:
+          description: part was uploaded
+        401:
+          description: not logged or unauthorized request
+
+  /api/devices/queue:
+    summary: returns information about loading qieue for devices
+    post:
+      summary: images queue information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: list of items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+        401:
+          description: not logged or unauthorized request
+
+  /api/devices/statistics:
+    summary: returns statistics for selected device

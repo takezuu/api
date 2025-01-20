@@ -1,0 +1,49 @@
+  /api/contacts:
+    summary: returns list of contacts (page) for provided filters and restrictions
+    post:
+      summary: returns page (list of rows) of contsact (as workspace subset)
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspaceRequest'
+
+      responses:
+        200:
+          description: total rows counter and array of rows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/workspaceRow'
+        400:
+          description: the request is not correct
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load contacts grid data
+
+  /api/contacts/report:
+    summary: adds new report for contacts to queue
+    post:
+      summary: add new report for contacts to report queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: id of added item
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not add a new report

@@ -1,0 +1,98 @@
+  /api/files/folder:
+    summary: returns folder content for specified parent forlder or root folder
+
+  /api/files/item:
+    summary: returns information for one row of the files grid
+
+  /api/files/grid:
+    summary: returns the grid page for file search operation
+
+  /api/files/note:
+    summary: note management for files
+
+  /api/files/star:
+    summary: star (ley evidences) management for files
+
+  /api/files/report:
+    summary: adds files report to queue
+    post:
+      summary: add new report for file search to report queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: id of added item
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not add a new report
+
+  /api/media:
+    get:
+      summary: returns content of one file by imgid and objid
+      responses:
+        200:
+          description: content found
+          content:
+            image/jpeg:
+              schema:
+               type: string
+               format: binary
+        400:
+          description: the object was not identified properly or can not be loaded
+        401:
+          description: not logged or unauthorized request
+      parameters:
+        - name: imgid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: objid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: SID
+          description: sessions ID
+          in: query
+          required: true
+          schema:
+              type: string
+
+  /api/preview:
+    get:
+      summary: returns thumbnail of one workspace item by imgid and objid
+      responses:
+        200:
+          description: preview found
+          content:
+            image/jpeg:
+              schema:
+               type: string
+               format: binary
+        400:
+          description: the object was not identified properly or can not be loaded
+        401:
+          description: not logged or unauthorized request
+      parameters:
+        - name: imgid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: objid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: SID
+          description: session ID
+          in: query
+          required: true
+          schema:
+              type: string
