@@ -1,0 +1,26 @@
+  /api/regions:
+    summary: returns a list of available regions
+    post:
+      summary: returns list of available regions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                    type: number
+                page:
+                    type: number
+                search:
+                    type: string
+                dateFrom:
+                    type: string
+                dateTo:
+                    type: string
+                order:
+                    type: string
+      responses:
+        200:
+          description: list of regions

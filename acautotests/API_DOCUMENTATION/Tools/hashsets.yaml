@@ -1,0 +1,204 @@
+  /api/hashsets:
+    post:
+      summary: returns list of available hash sets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                    type: number
+                page:
+                    type: number
+                search:
+                    type: string
+                dateFrom:
+                    type: string
+                dateTo:
+                    type: string
+                order:
+                    type: string
+      responses:
+        200:
+          description: list of hash sets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        type:
+                          description: MD5, SHA1, etc
+                          type: string
+                        note:
+                          type: string
+                        size:
+                          description: number of items in the list
+                          type: number
+                        status:
+                          description: 0 not ready, 1 ready, 2 indexing, 3 - empty
+                          type: number
+                        created:
+                          description: timestamp of list creation
+                          type: string
+                        hideThumbnail:
+                          type: boolean
+
+        400:
+          description: could not decode the hash set list request
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load list of hash sets with provided parameters
+
+  /api/hashsets/{id}:
+    summary: one hash set operations
+
+  /api/hashsetContent:
+    post:
+      summary: returns list of hash values of the set
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                  description: id of the hash set
+                limit:
+                  type: number
+                page:
+                  type: number
+                search:
+                  type: string
+      responses:
+        200:
+          description: list of hashes with total number of items
+        400:
+          description: could not decode the hashset content request
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load list of hash values with provided parameters
+
+  /api/hashsetContentUpdate:
+    post:
+      summary: adds hash values to the set
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                listid:
+                  type: number
+                  description: id of the hash set
+                items:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: items was added
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load add items to the list
+    delete:
+      summary: removes hash value from the set
+      parameters:
+        - name: hashsetid
+          required: true
+          in: path
+          schema:
+            type: number
+        - name: itemid
+          required: true
+          in: path
+          schema:
+            type: number
+        - name: search
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: value was removed
+        400:
+          description: wrong hash set id or item id
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: Could not remove hash set item
+
+  /api/hashsets/export:
+    summary: hash set export operation
+
+  /api/hashsets/import:
+    summary: import hash set
+    post:
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            description: MD5, SHA1, etc
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: file
+          in: query
+          required: true
+          schema:
+            type: string
+            format: binary
+            description: content of CSV or XLSX file depends on type value
+      responses:
+        200:
+          description: the hash set was imported
+        400:
+          description: wrong hash set id, type or empty name or the source file
+        500:
+          description: import error
+
+  /api/hashset_index:
+    summary: runs re-indexing for single hash list
+    post:
+      summary: re-index all images for one hash set
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hashsetid:
+                  type: number
+      responses:
+        200:
+          description: hash set was scheduled to indexing
+        401:
+          description: not logged or unauthorized request

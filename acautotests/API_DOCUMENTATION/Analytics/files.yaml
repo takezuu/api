@@ -1,0 +1,32 @@
+  /api/files/folder:
+    summary: returns folder content for specified parent forlder or root folder
+
+  /api/files/item:
+    summary: returns information for one row of the files grid
+
+  /api/files/grid:
+    summary: returns the grid page for file search operation
+
+  /api/files/note:
+    summary: note management for files
+
+  /api/files/star:
+    summary: star (ley evidences) management for files
+
+  /api/files/report:
+    summary: adds files report to queue
+    post:
+      summary: add new report for file search to report queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: id of added item
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not add a new report

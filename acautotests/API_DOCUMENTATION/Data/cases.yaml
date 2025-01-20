@@ -1,0 +1,119 @@
+  /api/cases:
+    post:
+      summary: returns list of cases based on provided options
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userID:
+                  type: number
+                  description: optional, will be get from session information if empty
+                search:
+                  type: string
+                  description: substring in case number or name
+                dateFrom:
+                  type: string
+                  format: MM.DD.YYYY HH.mm.SS
+                dateTo:
+                  type: string
+                  format: MM.DD.YYYY HH.mm.SS
+                limit:
+                  type: number
+                page:
+                  type: number
+                  description: the first page is 1
+                  default: 1
+                order:
+                  $ref: '#/components/schemas/order'
+                props:
+                  description: not used at the moment
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: returns an JSON array of cases
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: total number of cases without filtering
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/oneCase'
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not get list of cases
+
+  /api/cases/{id}:
+    summary: one case management
+    get:
+      summary: get detailed information about one case
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of the case to be retrieved
+          schema:
+            type: number
+
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oneCase'
+        400:
+          description: invalid case id provided or not case with provided id found
+        401:
+          description: not logged or unauthorized request
+    post:
+      summary: adds new case or update the existing one
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oneCase'
+
+      responses:
+        200:
+          description: case added or updated
+        400:
+          description: invalid request or non-unique case number or name
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not update or insert the case
+
+    delete:
+      summary: removes the existing case by {id}
+      responses:
+        200:
+          description: case was deleted
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not remove the case
+
+  /api/cases/tree:
+    summary: returns filters tree for cases page
+    post:
+      requestBody:
+        required: false
+      responses:
+        200:
+          description: the user is logged on
+          content:
+            application/json:
+              type: array
+        401:
+          description: invalid user name or password

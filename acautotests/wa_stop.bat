@@ -1,0 +1,1 @@
+C:\\backend\\WAMonitor.exe stop

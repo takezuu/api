@@ -1,0 +1,98 @@
+  /api/reports:
+    post:
+      summary: returns list of available reports for the current user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: substring in the name or in the alias
+                  type: string
+                dateFrom:
+                  type: string
+                dateTo:
+                  type: string
+                limit:
+                  type: number
+                  description: number of items on the page
+                page:
+                  type: number
+                order:
+                  $ref: '#/components/schemas/order'
+      responses:
+        200:
+          description: list of reports for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: unique id of the report
+                        created:
+                          type: string
+                          description: the report creation timestamp
+                        fileName:
+                          type: string
+                          description: user-defined name of the target file
+                        url:
+                          type: string
+                          description: relative URL of the ready to download report file
+                        status:
+                          type: number
+                          description: 0-created, 1 - in process, 2 - ready to download, 3 - deleted, 4- errors
+                        complete:
+                          type: number
+                          description: execution process, 0 to 100%
+                        note:
+                          type: string
+                          description: user-defined comment for the report
+        401:
+          description: not logged or unauthorized request
+
+  /api/reports/{id}:
+    summary: operations with a single report
+    delete:
+      parameters:
+        - name: id
+          description: id of the report to be deleted
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: the report has been deleted
+        401:
+          description: not logged or unauthorized request
+
+  /api/reports/run:
+    summary: returns a list of reports with status "executing"
+    post:
+      summary: returns list of available reports for the current user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: list of reports in progress for the user
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: not logged or unauthorized request

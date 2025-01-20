@@ -1,0 +1,73 @@
+  /api/tags:
+    get:
+      summary: returns complete list of tags
+      responses:
+        200:
+          description: list of tags as JSON array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/oneTag'
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load tags list
+
+  /api/tags/{id}:
+    summary: one tag management
+    get:
+      summary: get one tag details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+              type: number
+      responses:
+        200:
+          description: one tag details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oneTag'
+        400:
+          description: provided tag id is empty or invalid
+        401:
+          description: not logged or unauthorized request
+    delete:
+      summary: removes one tag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+              type: number
+      responses:
+        200:
+          description: user-defined tag is removed
+        400:
+          description: provided tag id is empty or invalid
+        401:
+          description: not logged or unauthorized request
+    post:
+      summary: add or update user-defined tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/oneTag'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+              type: number
+      responses:
+        200:
+          description: the tag added or updated
+        400:
+          description: provided tag id is empty or invalid
+        401:
+          description: not logged or unauthorized request

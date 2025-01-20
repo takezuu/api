@@ -1,0 +1,68 @@
+  /api/regexps:
+    get:
+      summary: returns a list of available regexps
+      responses:
+        200:
+          description: lists of regexps
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/oneRegexp'
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load list of regexps
+
+  /api/regexps/{id}:
+    summary: operations with a single regexp
+    delete:
+      description: removes regexp by id
+      parameters:
+          - name: id
+            in: path
+            required: true
+            schema:
+              type: number
+      responses:
+        200:
+          description: the regexp was deleted
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not delete the regexp
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/oneRegexp'
+      description: adds or updates a regexp depends on provided id
+      responses:
+        200:
+          description: the regexp was added or updated
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not update or insert the regexp
+
+  /api/regexps/export:
+    summary: export list of regexp
+
+  /api/regexps/import:
+    summary: import list of regexp
+
+  /api/reload:
+    get:
+      summary: force reload UI string and icons from the database
+      responses:
+        200:
+          description: lists are scheduled to reload
+

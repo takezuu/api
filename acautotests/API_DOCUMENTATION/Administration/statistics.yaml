@@ -1,0 +1,14 @@
+  /api/statistics/department:
+    summary: departmant-level system usage statistics
+
+  /api/statistics/report:
+    summary: system usage statistics report
+
+  /api/statistics/state:
+    summary: system usage status
+
+  /api/statistics/total:
+    summary: total system usage statistics
+
+  /api/statistics/user:
+    summary: user-level system usage statistics

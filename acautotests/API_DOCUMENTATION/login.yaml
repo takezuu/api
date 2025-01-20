@@ -1,0 +1,56 @@
+  /api/account/login:
+    post:
+      summary: make login, returns information about logged user or error
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  maxLength: 64
+                password:
+                  type: string
+                  maxLength: 64
+      responses:
+        200:
+          description: the user is logged on
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  SID:
+                    type: string
+                    description: session id
+                  CanonicalLogin:
+                    type: string
+                  FirstName:
+                    type: string
+                  LastName:
+                    type: string
+                  uid:
+                    type: number
+                    description: actually, it is integer id of the user in database
+                  status:
+                    description: 0-disabled, 1-administrator, 2-expert, 3-manager
+                    type: number
+        401:
+          description: invalid user name or password
+
+  /api/account/logout:
+    get:
+      summary: logout from the current session by SID
+      parameters:
+        - name: SID
+          in: query
+          required: true
+          schema:
+              type: string
+      responses:
+        200:
+          description: the user is logged out
+        401:
+          description: not logged or SID is not correct request

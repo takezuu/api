@@ -1,0 +1,656 @@
+components:
+  schemas:
+    fileRequest:
+      type: object
+      properties:
+        limit:
+          type: number
+        page:
+          type: number
+        order:
+          $ref: '#/components/schemas/order'
+          description: default column is "TimeModified"
+        searchMode:
+          type: number
+          description: 0 - substring, 1 - pattern, 2 - regular expression
+        value:
+          type: string
+        noCase:
+          type: boolean
+        searchFor:
+          type: number
+          description: 0 files, 1 folders, 2 files or folders
+        dateFrom:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        dateTo:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        timestampType:
+          type: string
+          enum: [TimeCreated, TimeModified, TimeLastAccessed, EXIF_DateTimeModified, EXIF_DateTimeDigitized, EXIF_DateTimeOriginal, EXIF_DateTimeCreated]
+          description: default column is "TimeModified"
+        hasExif:
+          type: boolean
+        hasGeo:
+          type: boolean
+        hasDuration:
+          type: boolean
+        minWidth:
+          type: number
+          minimum: 0
+        maxWidth:
+          type: number
+          minimum: 0
+        minDuration:
+          type: number
+          minimum: 0
+        maxDuration:
+          type: number
+          minimum: 0
+        minFileSize:
+          type: number
+          minimum: 0
+        maxFileSize:
+          type: number
+          minimum: 0
+        contentType:
+          type: string
+          description: image, document, audio, etc (single value or comma-delimited list)
+        contentTypeNot:
+          type: boolean
+        isRecovered:
+          type: boolean
+        isBroken:
+          type: boolean
+        isKeyEvd:
+          type: boolean
+        images:
+          description: list of image IDs
+          type: array
+          items:
+            type: number
+        cases:
+          description: list of case IDs
+          type: array
+          items:
+            type: number
+        tags:
+          description: list of tags IDs
+          type: array
+          items:
+            type: number
+        tagsOR:
+          type: boolean
+        remoteness:
+          $ref: '#/components/schemas/remoteness'
+
+    workspaceRequest:
+      type: object
+      properties:
+        limit:
+          type: number
+        page:
+          type: number
+        order:
+          $ref: '#/components/schemas/order'
+        description:
+          type: string
+          description: empty for search by reg expression
+        regexp:
+          type: string
+        dateFrom:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        dateTo:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        hasNote:
+          type: boolean
+          description: get rows with non-empty user nites only
+        remoteness:
+          $ref: '#/components/schemas/remoteness'
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/oneFilter'
+
+    remoteness:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: float32
+        longitude:
+          type: number
+          format: float32
+        distance:
+          description: 0 means no remoteness defined
+          type: number
+
+    oneComparison:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        status:
+          type: number
+        created:
+          description: date of comparison creation
+          type: string
+        allOverlap:
+          description: true for all results
+          type: boolean
+        userNote:
+          type: string
+        overlapCount:
+          type: number
+        dateFrom:
+          type: string
+        dateTo:
+          type: string
+        description:
+          type: string
+        useFiles:
+          type: boolean
+        useContacts:
+          type: boolean
+        useAccounts:
+          type: boolean
+        useGroups:
+          type: boolean
+        useCalls:
+          type: boolean
+        useMessages:
+          type: boolean
+        basket:
+          type: object
+          properties:
+            first:
+              type: object
+            second:
+              type: object
+        filterTree:
+          type: array
+
+    oneTag:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+          maxLength: 64
+        author:
+          type: string
+          maxLength: 32
+        color:
+          type: string
+          maxLength: 6
+        type:
+          description: 0 means system
+          type: number
+
+    oneUser:
+      type: object
+      properties:
+        id:
+          type: number
+        login:
+          type: string
+          minLength: 4
+          maxLength: 64
+        status:
+          type: number
+          description: 0 -disabled, 1 administrator, 2-expert,3 - manager
+        firstName:
+          type: string
+          maxLength: 128
+        middleName:
+          type: string
+          maxLength: 32
+        lastName:
+          type: string
+          maxLength: 128
+        title:
+          type: string
+          maxLength: 32
+        suffix:
+          type: string
+          maxLength: 32
+        position:
+          type: string
+          maxLength: 64
+        organization:
+          type: string
+          maxLength: 64
+        department:
+          type: string
+          maxLength: 64
+        phoneNo:
+          type: string
+          maxLength: 16
+        email:
+          type: string
+          maxLength: 64
+        note:
+          type: string
+        password:
+          type: string
+          minLength: 4
+          maxLength: 64
+        arCases:
+          type: array
+          items:
+            type: number
+          description: list of allowed casesID
+        arImages:
+          type: array
+          items:
+            type: number
+          description: list of allowed ImageID
+        arOperations:
+          type: array
+          items:
+            type: number
+          description: list of allowed operations (for future usage)
+
+    mapRow:
+      type: object
+      description: one data grid row of the workspace
+      properties:
+        imgid:
+          type: number
+        objid:
+          type: number
+        latitude:
+          type: number
+        longitude:
+          type: number
+
+    workspaceRow:
+      type: object
+      description: one data grid row of the workspace
+      properties:
+        imgid:
+          type: number
+        objid:
+          type: number
+        type:
+          type: string
+        description:
+          type: string
+        timestamp:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        isUTC:
+          type: boolean
+        direction:
+          type: string
+          maxLength: 64
+        account:
+          type: string
+        fromName:
+          type: string
+        fromNameMarkLength:
+          type: array
+          items:
+            type: number
+        fromNameMarkOffset:
+          type: array
+          items:
+            type: number
+        fromPhones:
+          type: string
+        fromPhonesMarkLength:
+          type: array
+          items:
+            type: number
+        fromPhonesMarkOffset:
+          type: array
+          items:
+            type: number
+        fromEmails:
+          type: string
+        fromEmailsMarkLength:
+          type: array
+          items:
+            type: number
+        fromEmailsMarkOffset:
+          type: array
+          items:
+            type: number
+        fromAccounts:
+          type: string
+        fromAccountsMarkLength:
+          type: array
+          items:
+            type: number
+        fromAccountsMarkOffset:
+          type: array
+          items:
+            type: number
+        toName:
+          type: string
+        toNameMarkLength:
+          type: array
+          items:
+            type: number
+        toNameMarkOffset:
+          type: array
+          items:
+            type: number
+        toPhones:
+          type: string
+        toPhonesMarkLength:
+          type: array
+          items:
+            type: number
+        toPhonesMarkOffset:
+          type: array
+          items:
+            type: number
+        toEmails:
+          type: string
+        toEmailsMarkLength:
+          type: array
+          items:
+            type: number
+        toEmailsMarkOffset:
+          type: array
+          items:
+            type: number
+        toAccounts:
+          type: string
+        toAccountsMarkLength:
+          type: array
+          items:
+            type: number
+        toAccountsMarkOffset:
+          type: array
+          items:
+            type: number
+        icon:
+          type: string
+        color:
+          type: string
+          description: hext tring with '#' prefix
+        isKeyEvd:
+          type: boolean
+        hasPreview:
+          type: boolean
+          description: /api/preview will return non-empty results for this imgid+objid
+        isGroupMessage:
+          type: string
+          description: empty, 'recipient'
+        deviceOwner:
+          type: string
+          description: empty, 'recipient', 'sender' or 'both'
+        descMarkLength:
+          description: list of lengths for marked parts of the 'description' field
+          type: array
+          items:
+            type: number
+        descMarkOffset:
+          description: list of offsets for marked parts of the 'description' field
+          type: array
+          items:
+            type: number
+        tags:
+          type: array
+          items:
+            type: number
+
+    fileRow:
+      type: object
+      description: one data grid row of the files, at the moment it returns the same structure as workspaceRow with 5 fields only
+      properties:
+        imgid:
+          type: number
+        objid:
+          type: number
+        icon:
+          type: string
+        color:
+          type: string
+        description:
+          type: string
+
+    oneCase:
+      type: object
+      properties:
+        id:
+          type: number
+        status:
+          description: 0- closed, 1 active
+          type: string
+        note:
+          type: string
+        number:
+          type: string
+          maxLength: 32
+        name:
+          type: string
+          maxLength: 128
+        department:
+          type: string
+          maxLength: 64
+        created:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        star:
+          type: string
+          description: 1 set, 0 not set
+        events:
+          type: number
+          description: total number of rows in the workspace for this case
+        devicesId:
+          type: array
+          items:
+            type: number
+            description: imgid
+
+    order:
+      type: object
+      description: parameters of 'order by' clause
+      properties:
+        by:
+          type: string
+        type:
+          type: string
+          enum: [asc,desc]
+
+    oneDevice:
+      type: object
+      description: brief information about image (device)
+      properties:
+        id:
+          type: number
+        alias:
+          type: string
+        name:
+          type: string
+        imported:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        color:
+          type: string
+        events:
+          type: number
+        casesId:
+          type: array
+          items:
+            type: number
+        note:
+          type: string
+        owner:
+          type: string
+        deviceTimezone:
+          type: string
+          description: name of timezone. The list of available timezones is /api/timezones
+          maxLength: 64
+        displayTimezone:
+          type: string
+          maxLength: 64
+
+    oneDeviceDetails:
+      type: object
+      description: detailed information about image (device)
+      properties:
+        id:
+          type: number
+        alias:
+          type: string
+        name:
+          type: string
+        imported:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        color:
+          type: string
+        events:
+          type: number
+        casesId:
+          type: array
+          items:
+            type: number
+        note:
+          type: string
+        owner:
+          type: string
+        os:
+          type: string
+        platform:
+          type: string
+        uuid:
+          type: string
+        created:
+          type: string
+          format: MM.DD.YYYY HH.mm.SS
+        nfiles:
+          type: number
+        ntimelineitems:
+          type: number
+        ncontacts:
+          type: number
+        naccounts:
+          type: number
+        ngroups:
+          type: number
+        nmessages:
+          type: number
+        ncalls:
+          type: number
+        ncalendars:
+          type: number
+        nlocations:
+          type: number
+        nFileArchive:
+          type: number
+        nFileImage:
+          type: number
+        nFileAudio:
+          type: number
+        nFileDocument:
+          type: number
+        nFileVideo:
+          type: number
+        nFileApplication:
+          type: number
+        nFilePlist:
+          type: number
+        nFileDatabase:
+          type: number
+        nFolders:
+          type: number
+        accountInfo:
+          type: array
+        prGroups:
+          type: array
+
+    oneDictionary:
+      type: object
+      description: complete dictionary information
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+          maxLength: 255
+        query:
+          type: string
+        created:
+          description: dictionary creation date/time
+          format: MM.DD.YYYY HH.mm.SS
+          type: string
+        counter:
+          description: workspace events counter for the dictionary
+          type: number
+        type:
+          description: 0 - common, 1 - user defined
+          type: number
+        author:
+          type: string
+          maxLength: 64
+        note:
+          type: string
+        state:
+          description: 0 - not ready, 1 ready, 2 indexing now, 3 - empty
+          type: number
+
+    oneFilter:
+      description: defines an item of the filters thee
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        alias:
+          type: string
+        hasNot:
+          type: boolean
+          description: the tree item has NOT modifier
+        hasAnd:
+          type: boolean
+          description: the tree item has AND modifier
+        not:
+          type: boolean
+          description: the NOT modifier was checked
+        and:
+          type: boolean
+          description: the AND modifier was checked
+        canBeLoaded:
+          type: boolean
+        events:
+          type: number
+        icon:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/oneFilter'
+
+    oneAbonent:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        events:
+          type: number
+
+    oneRegexp:
+      type: object
+      properties:
+        id:
+          type: number
+        expression:
+          type: string
+        name:
+          type: string
+        note:
+          type: string

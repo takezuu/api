@@ -1,0 +1,232 @@
+openapi: "2.0.0"
+info:
+  title: Analytic Centre Backend API
+  description: The document describes new (3.0) backend API of web analytics system
+  version: "3.0"
+
+paths:
+  /api/filters/abonents:
+    post:
+      summary: returns list of abonents with requested properties
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                search:
+                  type: string
+                  description: substring in the 'DisplayName' filed of the abonent
+                page:
+                  type: number
+                limit:
+                  type: number
+                order:
+                  $ref: '#/components/schemas/order'
+                filters:
+                  type: array
+                  items:
+                   $ref : '#/components/schemas/oneFilter'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: total number of unique abonents with non-empty DisplayName
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/oneAbonent'
+        400:
+          description: could not decode the abonents request
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not load list of abonents with provided parameters
+
+  /api/filters/analyzer:
+    summary: returns filters set for text analyzer page
+
+  /api/filters/accounts:
+    summary: returns list of accounts with requested properties
+
+  /api/filters/cases:
+    summary: returns filters tree for list of case page
+
+  /api/filters/contacts:
+    summary: returns the filters for contacts page
+
+  /api/filters/contacts/{id}:
+    summary: get one filter of contacts tree 
+
+  /api/filters/commonTree:
+    post:
+      summary: returns an hierarchy of filters for workspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workspaceRequest'
+      responses:
+        200:
+          description: returns an JSON array of Filter Items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/oneFilter'
+        400:
+          description: incorrect request parameters
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not build filters list/tree
+
+  /api/filters/commonTree/{id}:
+    summary: gen one filter of common tree
+
+  /api/filters/groups:
+    summary: returns list of groups with requested properties
+
+  /api/filters/fileTree:
+    post:
+      summary: returns the filters for file search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/fileRequest'
+      responses:
+        200:
+          description: returns an JSON array of Filter Items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/oneFilter'
+        400:
+          description: incorrect request parameters
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not build filters list/tree
+
+  /api/filters/fileTree/{id}:
+    summary: get one filter of file tree
+
+  /api/filters/maps:
+    summary: returns filters tree for maps
+
+  /api/filters/maps/{id}:
+    summary: returns one filters of tree for maps
+
+  /api/filters/saved:
+    summary: saved filters list
+
+  /api/filters/saved/{id}:
+    summary: one saved filters operations
+
+  /api/filters/searchTree:
+    summary: returns filters tree for full-text search
+
+  /api/graph:
+    summary: returns data for social graph (beta)
+
+  /api/search:
+    summary: full text search
+    get:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  description: string to search. +word and -word are acceptable
+                  type: string
+                exact:
+                  type: boolean
+                  description: true for exact phrase search
+                dictionaries:
+                  type: array
+                  description: list of id of dictionaries
+                limit:
+                  type: number
+                  description: number of items on the page
+                page:
+                  type: number
+      responses:
+        200:
+          description: search made successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: total number of results. Negative value means over limit
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        imgid: 
+                          type: number
+                        objid: 
+                          type: number
+                        text:
+                          type: string
+                        type:
+                          type: string
+                        source:
+                          type: string
+                        markOffset:
+                          type: array
+                          items:
+                            type: number
+                        markLength:
+                          type: array
+                          items:
+                            type: number
+
+  /api/search/report:
+    post:
+      summary: add new report for FT-search to report queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object        
+      responses:
+        200:
+          description: id of added item
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not add a new report
+
+  /api/timezones:
+    get:
+      summary: returns a list of available timezones as JSON array
+      responses:
+        200:
+          description: returns list of timezones in PostgreSQL-compatible format
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string

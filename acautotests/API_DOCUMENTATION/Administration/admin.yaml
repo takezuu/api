@@ -1,0 +1,378 @@
+  /api/users:
+    post:
+      summary: returns complete list of users. For login 'dbadmin' only
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                limit:
+                  type: number
+                page:
+                  type: number
+                  description: the first page has number 1
+                search:
+                  type: string
+                  description: search substring in login, FirstName or LastName
+                order:
+                  $ref: '#/components/schemas/order'
+
+    responses:
+      200:
+        description: list of users as a JSON array
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                total:
+                  type: number
+                  description: total number of users in the database
+                results:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/oneUser'
+      401:
+        description: not logged or unauthorized request
+      500:
+        description: could not get user list
+
+  /api/users/{id}:
+    summary: one user management. For login 'dbadmin' only
+    get:
+      summary: get one user details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+              type: number
+      responses:
+        200:
+          description: one user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oneUser'
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not get user details
+    post:
+      summary: add or update the user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order:
+                  $ref: '#/components/schemas/oneUser'
+      responses:
+        200:
+          description: user added or updated
+        400:
+          description: non-unique login or user's properties
+        500:
+          description: could not add or modify the user
+    delete:
+      summary: remove one user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+              type: number
+      responses:
+        200:
+          description: the user was removed
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not remove the user
+
+  /api/account/groups:
+    summary: returns a list of available user groups (departments)
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  type: string
+                  description: substring in group name
+                limit:
+                  type: number
+                page:
+                  type: number
+                  description: the first page is 1
+                  default: 1
+                order:
+                  $ref: '#/components/schemas/order'
+      responses:
+        200:
+          description: returns a list of groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: number of available user groups
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        note:
+                          type: string
+                        users:
+                          description: id of users in the group
+                          type: array
+                          items:
+                            type: number
+                        arCases:
+                          description: allowed cases id list
+                          type: array
+                          items:
+                            type: number
+                        arImages:
+                          description: allowed images id list
+                          type: array
+                          items:
+                            type: number
+                        arOperations:
+                          type: array
+                          items:
+                            type: number
+        401:
+          description: invalid user name/password  or not enough rights to get the list
+        500:
+          description: could not get list of groups
+
+  /api/account/group/{id}:
+    summary: sibngle user's group operations
+    delete:
+      description: removes group by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: the group was deleted
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not delete the group
+    post:
+      description: add or update user group depends on passed id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                  description: group id or 0 for new group
+                name:
+                  description: name of the group
+                  type: string
+                note:
+                  type: number
+                users:
+                  type: array
+                  description: list of users in the group
+                  items:
+                    type: number
+                arCases:
+                  type: array
+                  description: list of allowed cases for the group
+                  items:
+                    type: number
+                arImages:
+                  type: array
+                  description: list of allowed images for the group
+                  items:
+                    type: number
+                arOperations:
+                  type: array
+                  description: list of allowed operations for the group
+                  items:
+                    type: number
+
+      responses:
+        200:
+          description: the group was added or updated
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: could not insert or update the group
+
+  /api/account/rights:
+    post:
+      summary: assigning user rights
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                  description: user's id
+                arImages:
+                  type: array
+                  description: list of id of allowed images
+                  items:
+                    type: number
+                arCases:
+                  type: array
+                  description: list of id of allowed cases
+                  items:
+                    type: number
+                arOperations:
+                  type: array
+                  description: list of allowed operations
+                  items:
+                    type: number
+      responses:
+        200:
+          description: requested rights was assigned. The user relogin is required
+        401:
+          description: not logged or unauthorized request
+        500:
+          description: error assigning, see message for details
+
+  /api/activities:
+    summary: provides information about user's activities
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  type: string
+                  description: substring in case number or name
+                dateFrom:
+                  type: string
+                  format: MM.DD.YYYY HH.mm.SS
+                dateTo:
+                  type: string
+                  format: MM.DD.YYYY HH.mm.SS
+                order:
+                  $ref: '#/components/schemas/order'
+      responses:
+        200:
+          description: returns an activities information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        page:
+                          type: string
+                        login:
+                          type: string
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        diff:
+                          type: string
+                        ip:
+                          type: string
+                        timestamp:
+                          type: string
+                        status:
+                          type: number
+        401:
+          description: not logged or unauthorized request
+
+  /api/account/activety:
+    summary: updates information about end user (front-end) activity
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: string
+                  description: active page for the user identified by session id
+      responses:
+        200:
+          description: the user's status is updated
+        401:
+          description: invalid session provided
+
+  /api/account/current:
+    get:
+      summary: returns information about current user (SID owner)
+      responses:
+        200:
+          description: information about session owner
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  SID:
+                    type: string
+                  CanonicalLogin:
+                    type: string
+                  FirstName:
+                    type: string
+                  LastName:
+                    type: string
+                  UID:
+                    type: string
+                  Status:
+                    type: string
+        401:
+          description: not logged or unauthorized request
+
+  /api/logout:
+    get:
+      summary: force logout by 'login'. No Authorization is required
+      parameters:
+        - name: login
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: the user was logged out
+        400:
+          description: the provided login is incorrect or the user is not logged in

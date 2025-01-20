@@ -1,0 +1,196 @@
+  /api/login_ext:
+    get:
+      summary: custom login for data loader
+      responses:
+        200:
+          description: OK even login was unsuccessful for backward compatibility with loaders
+      parameters:
+        - name: UID
+          description: login of the user
+          in: query
+          required: true
+          schema:
+              type: string
+        - name: PWD
+          in: query
+          required: true
+          schema:
+              type: string
+
+  /api/login_short:
+    summary: direct login operation for desktop product
+
+  /api/logs:
+    summary: shows list of logs (for 'dbadmin' only) as html page
+    get:
+      responses:
+        200:
+          content:
+            text/html:
+
+  /api/logs/{id}:
+    summary: one log content (for 'dbadmin' only)
+    get:
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/logs/write:
+    summary: allows the front-end to write to server log, no authorization is required
+    get:
+      parameters:
+        - name: message
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: the message has been written to the log
+        400:
+          description: empty message was passed
+
+  /api/loading:
+    summary: internal API call (callback) for OxyIprocess interconnection
+
+  /api/license:
+    summary: shows server license details as a text page
+
+  /api/media:
+    get:
+      summary: returns content of one file by imgid and objid
+      responses:
+        200:
+          description: content found
+          content:
+            image/jpeg:
+              schema:
+               type: string
+               format: binary
+        400:
+          description: the object was not identified properly or can not be loaded
+        401:
+          description: not logged or unauthorized request
+      parameters:
+        - name: imgid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: objid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: SID
+          description: sessions ID
+          in: query
+          required: true
+          schema:
+              type: string
+
+  /api/monitor:
+    get:
+      summary: returns application state/diagnostics in the text or html format.
+      responses:
+        200:
+          description: backend state returned
+
+  /api/preview:
+    get:
+      summary: returns thumbnail of one workspace item by imgid and objid
+      responses:
+        200:
+          description: preview found
+          content:
+            image/jpeg:
+              schema:
+               type: string
+               format: binary
+        400:
+          description: the object was not identified properly or can not be loaded
+        401:
+          description: not logged or unauthorized request
+      parameters:
+        - name: imgid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: objid
+          in: query
+          required: true
+          schema:
+              type: number
+        - name: SID
+          description: session ID
+          in: query
+          required: true
+          schema:
+              type: string
+
+  /api/quit:
+    get:
+      summary: unconditionally terminates the backend
+      responses:
+        200:
+          description: backend is prepared to terminate
+
+  /api/translate:
+    get:
+      summary: returns UI strings for server-defined language. Authorization is not required
+      responses:
+        200:
+          description: returns JSON array of translation items
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  language:
+                    type: string
+                  strings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        item:
+                          type: string
+                        str:
+                          type: string
+                        page:
+                          type: string
+
+  /api/tile:
+    summary: returns single map tile
+
+  /api/version:
+    get:
+      summary: returns backend version as a string
+      responses:
+        200:
+          description: backend build number
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+
+  /api/space:
+    get:
+      summary: checks for free space on the system or database volume
+      responses:
+        200:
+          description: OK, "1" means OK "0" means not enough space or could not get free space information
+          content:
+            text/csv:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: string
